@@ -23,17 +23,14 @@ if (list) {
     }
 
     if (child.tagName === "UL") {
-      let span = child.querySelector("span");
+      let source = child.querySelector("span audio source");
       let quote = child.querySelector("i");
 
       let quoteAudioSrc = "";
       let quoteText = "";
 
-      if (span) {
-        let audioTag = span.querySelector("audio");
-        let sourceTag = audioTag.querySelector("source");
-
-        quoteAudioSrc = sourceTag.getAttribute("src");
+      if (source) {
+        quoteAudioSrc = source.getAttribute("src");
       }
 
       if (quote) {
