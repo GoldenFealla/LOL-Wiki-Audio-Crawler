@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "LoL Wiki Crawler",
+  "version": "1.0",
+  "description": "This will crawl audio and quotes from lol wiki",
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": "images/icon.png"
+  },
+  "permissions": ["activeTab"],
+  "content_scripts": [
+    {
+      "js": ["scripts/content.js"],
+      "matches": ["https://leagueoflegends.fandom.com/*"]
+    }
+  ]
+}
