@@ -6,47 +6,105 @@ const championName = currentURL.split("/")[4];
 console.log("championName", championName);
 
 let jsonData = [];
+let currentType = "";
+let currentTypeCategory = "";
 
-if (list) {
-  let currentType = "";
-  let currentTypeCategory = "";
+/**
+ *
+ * @param {HTMLHeadingElement} element
+ */
+function handleH2(element) {
+  const span = element.querySelector(".mw-headline");
 
-  for (let i = 0; i < list.children.length; i++) {
-    const child = list.children[i];
+  if (span) {
+    currentType = span.innerText;
+  }
+}
 
-    if (child.tagName === "H2") {
-      currentType = child.innerText;
+/**
+ *
+ * @param {HTMLHeadingElement} element
+ */
+function handleH3(element) {
+  const span = element.querySelector(".mw-headline");
+
+  if (span) {
+    currentTypeCategory = span.innerText;
+  }
+}
+
+/**
+ *
+ * @param {HTMLUListElement} element
+ */
+function handleUL(element) {
+  let source = element.querySelectorAll("span audio source");
+  let quote = element.querySelector("i");
+
+  let quoteAudioSrc = "";
+  let quoteText = "";
+
+  if (quote) {
+    quoteText = quote.innerText;
+  }
+
+  source.forEach((sourceChild) => {
+    if (sourceChild) {
+      quoteAudioSrc = sourceChild.getAttribute("src");
     }
 
-    if (child.tagName === "H3") {
-      currentTypeCategory = child.innerText;
+    const data = {
+      type: currentType,
+      category: currentTypeCategory,
+      audio: quoteAudioSrc,
+      quote: quoteText,
+    };
+
+    jsonData.push(data);
+  });
+}
+
+/**
+ *
+ * @param {HTMLDivElement} element
+ */
+function handleDiv(element) {
+  if (element.classList.contains("ad-slot-placeholder")) {
+    return;
+  }
+
+  for (let i = 0; i < element.children.length; i++) {
+    const child = element.children[i];
+    const tagName = child.tagName;
+
+    if (functionCallMap[tagName]) {
+      let result = functionCallMap[tagName](child);
     }
 
-    if (child.tagName === "UL") {
-      let source = child.querySelector("span audio source");
-      let quote = child.querySelector("i");
-
-      let quoteAudioSrc = "";
-      let quoteText = "";
-
-      if (source) {
-        quoteAudioSrc = source.getAttribute("src");
-      }
-
-      if (quote) {
-        quoteText = quote.innerText;
-      }
-
-      const data = {
-        type: currentType,
-        category: currentTypeCategory,
-        audio: quoteAudioSrc,
-        quote: quoteText,
-      };
-
-      jsonData.push(data);
+    if (currentType === "Trivia") {
+      break;
     }
   }
+}
+
+const functionCallMap = {
+  H2: handleH2,
+  H3: handleH3,
+  UL: handleUL,
+  DIV: handleDiv,
+};
+
+if (list) {
+  for (let i = 0; i < list.children.length; i++) {
+    const child = list.children[i];
+    const tagName = child.tagName;
+
+    if (functionCallMap[tagName]) {
+      functionCallMap[tagName](child);
+    }
+  }
+
+  console.log(jsonData);
 
   jsonData = jsonData.filter((data) => {
     return !(
